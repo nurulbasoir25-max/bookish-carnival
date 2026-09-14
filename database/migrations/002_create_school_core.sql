@@ -1,0 +1,96 @@
+CREATE TABLE siswa (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    nis VARCHAR(30) NULL UNIQUE,
+    nisn VARCHAR(20) NULL UNIQUE,
+    nik VARCHAR(20) NULL UNIQUE,
+    no_kk VARCHAR(20) NULL,
+    nama_lengkap VARCHAR(150) NOT NULL,
+    nama_panggilan VARCHAR(75) NULL,
+    tempat_lahir VARCHAR(100) NULL,
+    tanggal_lahir DATE NULL,
+    jenis_kelamin CHAR(1) NULL,
+    agama VARCHAR(50) NULL,
+    anak_ke TINYINT UNSIGNED NULL,
+    jumlah_saudara TINYINT UNSIGNED NULL,
+    alamat TEXT NULL,
+    rt VARCHAR(5) NULL,
+    rw VARCHAR(5) NULL,
+    desa_kelurahan VARCHAR(100) NULL,
+    kecamatan VARCHAR(100) NULL,
+    kabupaten VARCHAR(100) NULL,
+    provinsi VARCHAR(100) NULL,
+    kode_pos VARCHAR(10) NULL,
+    no_hp VARCHAR(30) NULL,
+    email VARCHAR(150) NULL,
+    tahun_masuk SMALLINT UNSIGNED NULL,
+    status VARCHAR(30) NOT NULL DEFAULT 'aktif',
+    created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_siswa_nama (nama_lengkap),
+    INDEX idx_siswa_status (status)
+);
+
+CREATE TABLE orang_tua (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    siswa_id BIGINT UNSIGNED NOT NULL UNIQUE,
+    nama_ayah VARCHAR(150) NULL,
+    nik_ayah VARCHAR(20) NULL,
+    pekerjaan_ayah VARCHAR(100) NULL,
+    pendidikan_ayah VARCHAR(100) NULL,
+    nama_ibu VARCHAR(150) NULL,
+    nik_ibu VARCHAR(20) NULL,
+    pekerjaan_ibu VARCHAR(100) NULL,
+    pendidikan_ibu VARCHAR(100) NULL,
+    nama_wali VARCHAR(150) NULL,
+    nik_wali VARCHAR(20) NULL,
+    pekerjaan_wali VARCHAR(100) NULL,
+    no_hp VARCHAR(30) NULL,
+    alamat TEXT NULL,
+    created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_orang_tua_siswa FOREIGN KEY (siswa_id) REFERENCES siswa(id) ON DELETE CASCADE
+);
+
+CREATE TABLE kelas (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    nama VARCHAR(50) NOT NULL,
+    tingkat TINYINT UNSIGNED NOT NULL,
+    created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_kelas_nama_tingkat (nama, tingkat)
+);
+
+CREATE TABLE tahun_ajaran (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    nama VARCHAR(20) NOT NULL UNIQUE,
+    aktif BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE rombel (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    tahun_ajaran_id BIGINT UNSIGNED NOT NULL,
+    kelas_id BIGINT UNSIGNED NOT NULL,
+    nama VARCHAR(50) NOT NULL,
+    wali_kelas_id BIGINT UNSIGNED NULL,
+    created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_rombel_tahun FOREIGN KEY (tahun_ajaran_id) REFERENCES tahun_ajaran(id) ON DELETE RESTRICT,
+    CONSTRAINT fk_rombel_kelas FOREIGN KEY (kelas_id) REFERENCES kelas(id) ON DELETE RESTRICT,
+    INDEX idx_rombel_tahun (tahun_ajaran_id)
+);
+
+CREATE TABLE riwayat_kelas (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    siswa_id BIGINT UNSIGNED NOT NULL,
+    rombel_id BIGINT UNSIGNED NOT NULL,
+    tanggal_mulai DATE NULL,
+    tanggal_selesai DATE NULL,
+    status VARCHAR(30) NOT NULL DEFAULT 'aktif',
+    created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_riwayat_kelas_siswa FOREIGN KEY (siswa_id) REFERENCES siswa(id) ON DELETE CASCADE,
+    CONSTRAINT fk_riwayat_kelas_rombel FOREIGN KEY (rombel_id) REFERENCES rombel(id) ON DELETE RESTRICT,
+    INDEX idx_riwayat_kelas_siswa (siswa_id)
+);
